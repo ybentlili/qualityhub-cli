@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="JUnit Test Results" tests="52" failures="2" errors="0" skipped="1" time="12.456">
+    <testsuite name="com.example.UserServiceTest" tests="15" failures="1" errors="0" skipped="0" time="3.234" timestamp="2026-01-31T19:00:00">
+        <properties>
+            <property name="java.version" value="17.0.5"/>
+            <property name="java.vendor" value="Oracle Corporation"/>
+        </properties>
+
+        <testcase classname="com.example.UserServiceTest" name="testFindUserById" time="0.123"/>
+        <testcase classname="com.example.UserServiceTest" name="testCreateUser" time="0.089"/>
+        <testcase classname="com.example.UserServiceTest" name="testUpdateUser" time="0.156"/>
+        <testcase classname="com.example.UserServiceTest" name="testDeleteUser" time="0.098"/>
+        <testcase classname="com.example.UserServiceTest" name="testListUsers" time="0.234"/>
+        <testcase classname="com.example.UserServiceTest" name="testUserNotFound" time="0.067"/>
+        <testcase classname="com.example.UserServiceTest" name="testDuplicateEmail" time="0.089">
+            <failure message="Expected exception not thrown" type="junit.framework.AssertionFailedError">
+                junit.framework.AssertionFailedError: Expected exception not thrown
+                at com.example.UserServiceTest.testDuplicateEmail(UserServiceTest.java:89)
+            </failure>
+        </testcase>
+        <testcase classname="com.example.UserServiceTest" name="testValidation" time="0.045"/>
+        <testcase classname="com.example.UserServiceTest" name="testPasswordEncryption" time="0.178"/>
+        <testcase classname="com.example.UserServiceTest" name="testEmailValidation" time="0.034"/>
+        <testcase classname="com.example.UserServiceTest" name="testRoleAssignment" time="0.067"/>
+        <testcase classname="com.example.UserServiceTest" name="testUserPermissions" time="0.123"/>
+        <testcase classname="com.example.UserServiceTest" name="testConcurrentUpdates" time="0.456"/>
+        <testcase classname="com.example.UserServiceTest" name="testBatchOperations" time="0.678"/>
+        <testcase classname="com.example.UserServiceTest" name="testTransactions" time="0.798"/>
+
+        <system-out><![CDATA[Test output here]]></system-out>
+        <system-err><![CDATA[]]></system-err>
+    </testsuite>
+
+    <testsuite name="com.example.AuthenticationTest" tests="20" failures="0" errors="0" skipped="0" time="4.123" timestamp="2026-01-31T19:00:04">
+        <testcase classname="com.example.AuthenticationTest" name="testLogin" time="0.145"/>
+        <testcase classname="com.example.AuthenticationTest" name="testLogout" time="0.067"/>
+        <testcase classname="com.example.AuthenticationTest" name="testTokenGeneration" time="0.234"/>
+        <testcase classname="com.example.AuthenticationTest" name="testTokenValidation" time="0.189"/>
+        <testcase classname="com.example.AuthenticationTest" name="testTokenExpiration" time="0.456"/>
+        <testcase classname="com.example.AuthenticationTest" name="testRefreshToken" time="0.234"/>
+        <testcase classname="com.example.AuthenticationTest" name="testInvalidCredentials" time="0.078"/>
+        <testcase classname="com.example.AuthenticationTest" name="testAccountLockout" time="0.345"/>
+        <testcase classname="com.example.AuthenticationTest" name="testPasswordReset" time="0.267"/>
+        <testcase classname="com.example.AuthenticationTest" name="testTwoFactorAuth" time="0.456"/>
+        <testcase classname="com.example.AuthenticationTest" name="testOAuthLogin" time="0.389"/>
+        <testcase classname="com.example.AuthenticationTest" name="testSSOIntegration" time="0.234"/>
+        <testcase classname="com.example.AuthenticationTest" name="testSessionManagement" time="0.156"/>
+        <testcase classname="com.example.AuthenticationTest" name="testConcurrentLogins" time="0.289"/>
+        <testcase classname="com.example.AuthenticationTest" name="testBruteForceProtection" time="0.178"/>
+        <testcase classname="com.example.AuthenticationTest" name="testIPWhitelisting" time="0.089"/>
+        <testcase classname="com.example.AuthenticationTest" name="testRateLimiting" time="0.123"/>
+        <testcase classname="com.example.AuthenticationTest" name="testAuditLogging" time="0.145"/>
+        <testcase classname="com.example.AuthenticationTest" name="testPermissionChecks" time="0.098"/>
+        <testcase classname="com.example.AuthenticationTest" name="testRoleHierarchy" time="0.112"/>
+    </testsuite>
+
+    <testsuite name="com.example.ApiControllerTest" tests="17" failures="1" errors="0" skipped="1" time="5.099" timestamp="2026-01-31T19:00:08">
+        <testcase classname="com.example.ApiControllerTest" name="testGetEndpoint" time="0.234"/>
+        <testcase classname="com.example.ApiControllerTest" name="testPostEndpoint" time="0.189"/>
+        <testcase classname="com.example.ApiControllerTest" name="testPutEndpoint" time="0.267"/>
+        <testcase classname="com.example.ApiControllerTest" name="testDeleteEndpoint" time="0.145"/>
+        <testcase classname="com.example.ApiControllerTest" name="testPatchEndpoint" time="0.123"/>
+        <testcase classname="com.example.ApiControllerTest" name="testValidationErrors" time="0.089">
+            <failure message="Validation error not returned" type="junit.framework.AssertionFailedError">
+                junit.framework.AssertionFailedError: Expected 400 status code, got 500
+                at com.example.ApiControllerTest.testValidationErrors(ApiControllerTest.java:156)
+            </failure>
+        </testcase>
+        <testcase classname="com.example.ApiControllerTest" name="testAuthorizationHeaders" time="0.078"/>
+        <testcase classname="com.example.ApiControllerTest" name="testCORSHeaders" time="0.067"/>
+        <testcase classname="com.example.ApiControllerTest" name="testRateLimiting" time="0.456"/>
+        <testcase classname="com.example.ApiControllerTest" name="testPagination" time="0.234"/>
+        <testcase classname="com.example.ApiControllerTest" name="testSorting" time="0.189"/>
+        <testcase classname="com.example.ApiControllerTest" name="testFiltering" time="0.267"/>
+        <testcase classname="com.example.ApiControllerTest" name="testSearching" time="0.345"/>
+        <testcase classname="com.example.ApiControllerTest" name="testBulkOperations" time="0.678"/>
+        <testcase classname="com.example.ApiControllerTest" name="testAsyncProcessing" time="1.234">
+            <skipped message="Skipped due to timeout issues"/>
+        </testcase>
+        <testcase classname="com.example.ApiControllerTest" name="testErrorHandling" time="0.156"/>
+        <testcase classname="com.example.ApiControllerTest" name="testContentNegotiation" time="0.089"/>
+    </testsuite>
+</testsuites>

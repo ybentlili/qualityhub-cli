@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+
+# Build
+dist/
+*.tsbuildinfo
+
+# Environment
+.env
+.env.local
+
+# Config files
+.qualityhub.yaml
+qa-result.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
