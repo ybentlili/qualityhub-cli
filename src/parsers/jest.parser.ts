@@ -63,17 +63,51 @@ export class JestParser extends BaseParser {
         duration_ms: number;
         flaky_tests?: string[];
     } {
-        // Try to find jest test results
-        const testResultsPath = path.join(path.dirname(coverageDir), 'test-results.json');
+        // Search for test-results.json in multiple locations
+        const searchPaths = [
+            path.join(coverageDir, 'test-results.json'),           // inside coverage dir
+            path.join(path.dirname(coverageDir), 'test-results.json'), // parent dir
+            path.join(process.cwd(), 'test-results.json'),         // project root
+        ];
 
-        if (fs.existsSync(testResultsPath)) {
+        const testResultsPath = searchPaths.find(p => fs.existsSync(p));
+
+        if (testResultsPath) {
             const testData = JSON.parse(fs.readFileSync(testResultsPath, 'utf-8'));
+
+            // Calculate duration from testResults array
+            let duration_ms = 0;
+            if (testData.testResults && Array.isArray(testData.testResults)) {
+                duration_ms = testData.testResults.reduce((acc: number, r: any) => {
+                    // Support both perfStats.runtime and startTime/endTime
+                    if (r.perfStats?.runtime) return acc + r.perfStats.runtime;
+                    if (r.endTime && r.startTime) return acc + (r.endTime - r.startTime);
+                    return acc;
+                }, 0);
+            }
+
+            // Detect slow tests (>5s) as potential flaky candidates
+            const flaky_tests: string[] = [];
+            if (testData.testResults && Array.isArray(testData.testResults)) {
+                for (const suite of testData.testResults) {
+                    if (suite.assertionResults && Array.isArray(suite.assertionResults)) {
+                        for (const test of suite.assertionResults) {
+                            if (test.duration && test.duration > 5000) {
+                                const name = [...(test.ancestorTitles || []), test.title].join(' > ');
+                                flaky_tests.push(name);
+                            }
+                        }
+                    }
+                }
+            }
+
             return {
                 total: testData.numTotalTests || 0,
                 passed: testData.numPassedTests || 0,
                 failed: testData.numFailedTests || 0,
                 skipped: testData.numPendingTests || 0,
-                duration_ms: testData.testResults?.reduce((acc: number, r: any) => acc + (r.perfStats?.runtime || 0), 0) || 0,
+                duration_ms,
+                flaky_tests: flaky_tests.length > 0 ? flaky_tests : undefined,
             };
         }
 

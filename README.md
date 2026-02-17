@@ -1,296 +1,310 @@
-# 🔧 QualityHub CLI
+# 🔍 QualityHub CLI
 
 [![npm version](https://img.shields.io/npm/v/qualityhub-cli.svg)](https://www.npmjs.com/package/qualityhub-cli)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-green.svg)](https://nodejs.org/)
 
-Command-line tool to parse test results, generate `qa-result.json`, and push to QualityHub for AI-powered quality analysis.
+**Know if your release is safe to deploy — in 2 seconds.**
 
-## ✨ Features
+QualityHub CLI parses your test results, analyzes quality trends, detects regressions, and gives you a clear risk score with a go/no-go decision. Works locally, in CI/CD, and on merge requests.
 
-- 🧪 **Parse test results** from Jest, JaCoCo, JUnit
-- 📊 **Generate qa-result.json** automatically
-- 🚀 **Push to QualityHub** backend
-- 🎨 **Colorful output** with risk analysis
-- ⚡ **Fast and lightweight**
+<!-- TODO: replace with your actual GIF -->
+![QualityHub CLI Demo](docs/demo.gif)
 
 ---
 
-## 🚀 Installation
-
-### Global Installation (Recommended)
+## ⚡ Quick Start
 
 ```bash
+# Install
 npm install -g qualityhub-cli
+
+# Run your tests, then:
+qualityhub parse jest ./coverage
+qualityhub analyze
 ```
 
-### Local Development
+That's it. No account, no config, no server needed.
 
-```bash
-git clone https://github.com/ybentlili/qualityhub-cli
-cd qualityhub-cli
-npm install
-npm run build
-npm link
+---
+
+## 🎯 What You Get
+
 ```
+🔍 QualityHub Analysis
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   Project:  my-app@2.3.1
+   Branch:   main
+   Commit:   a3f4d2c
+
+   📊 Tests
+      ❌ 243/250 passed (97.2%)
+      ❌ 4 failed
+      ⏭️  3 skipped
+      ⏱️  Duration: 12.7s
+
+   📈 Coverage
+      Lines:      █████████████████░░░ 87.3%  ▼ -3.2%
+      Branches:   ████████████████░░░░ 82.2%
+      Functions:  ██████████████████░░ 91.3%
+
+   🚨 Issues Detected
+      🟡 4 tests failed (97.2% pass rate)
+      🎲 2 flaky tests detected
+      📉 Coverage dropped 3.2% since last run
+      🆕 2 new test failures since last run
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🎯 Risk Score:  ⚠️ 72/100 (MEDIUM RISK)
+   📋 Decision:    ⚠️  CAUTION — Review issues before deploying
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+---
+
+## ✨ Features
+
+- **🔍 Instant analysis** — Risk score + go/no-go decision in seconds
+- **📉 Regression detection** — Automatically compares with previous runs
+- **🎲 Flaky test detection** — Identifies slow/unreliable tests
+- **📊 Coverage tracking** — Lines, branches, functions with trend deltas
+- **📝 Markdown reports** — Post analysis directly on GitLab MRs / GitHub PRs
+- **🔌 Multi-framework** — Jest, JUnit, JaCoCo out of the box
+- **⚡ Zero config** — Works instantly, no server required
 
 ---
 
 ## 📖 Usage
 
-### 1️⃣ Initialize Project
+### 1. Parse your test results
 
 ```bash
-qualityhub init
-```
-
-Creates `.qualityhub.yaml`:
-```yaml
-api_endpoint: http://localhost:8080
-project_name: ''
-```
-
----
-
-### 2️⃣ Parse Test Results
-
-#### **Jest** (JavaScript/TypeScript)
-
-```bash
-# Parse Jest coverage
+# JavaScript / TypeScript (Jest)
 qualityhub parse jest ./coverage
 
-# With options
+# Java / Kotlin (JaCoCo + JUnit)
+qualityhub parse jacoco ./target/site/jacoco/jacoco.xml
+qualityhub parse junit ./target/surefire-reports
+
+# With project metadata
 qualityhub parse jest ./coverage \
-  --output qa-result.json \
   --project my-app \
-  --version 1.2.3 \
-  --commit abc123 \
+  --version 2.3.1 \
+  --commit a3f4d2c \
   --branch main
 ```
 
-**Required files**:
-- `coverage/coverage-summary.json` (required)
-- `test-results.json` (optional)
-
----
-
-#### **JaCoCo** (Java Coverage)
+### 2. Analyze
 
 ```bash
-# Parse JaCoCo XML report
-qualityhub parse jacoco ./target/site/jacoco/jacoco.xml
+# Terminal output (default)
+qualityhub analyze
 
-# With options
-qualityhub parse jacoco ./build/reports/jacoco/test/jacocoTestReport.xml \
-  --output qa-result.json \
-  --project my-java-app
+# Markdown output (for MR/PR comments)
+qualityhub analyze --format markdown
+
+# Save markdown to file
+qualityhub analyze --format markdown --output report.md
 ```
 
-**Required files**:
-- `jacoco.xml`
-
----
-
-#### **JUnit** (Java/Kotlin/Python Tests)
-
-```bash
-# Parse JUnit XML reports
-qualityhub parse junit ./build/test-results/test
-
-# With options
-qualityhub parse junit ./target/surefire-reports \
-  --output qa-result.json \
-  --project my-api
-```
-
-**Required files**:
-- `TEST-*.xml` files
-
----
-
-### 3️⃣ Push to QualityHub
+### 3. Push to QualityHub (optional)
 
 ```bash
 qualityhub push qa-result.json
 ```
 
-**Output example**:
-```
-✅ QA results uploaded successfully!
+---
 
-Result ID: 123e4567-e89b-12d3-a456-426614174000
-Risk Score: 85/100
-Status: SAFE
-Decision: PROCEED
+## 🔄 CI/CD Integration
 
-View details: http://localhost:3000/dashboard
+### GitLab CI
+
+```yaml
+quality-check:
+  stage: test
+  script:
+    - npm test -- --coverage
+    - npx qualityhub-cli parse jest ./coverage
+    - npx qualityhub-cli analyze
+  cache:
+    paths:
+      - .qualityhub/   # Persist history between runs
+  artifacts:
+    when: always
+    paths:
+      - qa-result.json
 ```
+
+### GitHub Actions
+
+```yaml
+- name: Quality Check
+  run: |
+    npm test -- --coverage
+    npx qualityhub-cli parse jest ./coverage
+    npx qualityhub-cli analyze
+
+- name: Cache QualityHub history
+  uses: actions/cache@v3
+  with:
+    path: .qualityhub
+    key: qualityhub-${{ github.ref }}
+```
+
+The CLI exits with code 1 when the decision is **BLOCK**, so your pipeline fails automatically on critical quality issues.
 
 ---
 
-## 🎯 Complete Workflow
+## 📝 Markdown Reports for Merge Requests
+
+Generate a markdown report to post on your MR/PR:
 
 ```bash
-# 1. Initialize (once)
-qualityhub init
-
-# 2. Run your tests with coverage
-npm test -- --coverage              # Jest
-./gradlew test jacocoTestReport     # Java/Gradle
-mvn test jacoco:report               # Java/Maven
-
-# 3. Parse results
-qualityhub parse jest ./coverage
-
-# 4. Push to QualityHub
-qualityhub push qa-result.json
-
-# 5. View in dashboard
-open http://localhost:3000/dashboard
+qualityhub analyze --format markdown
 ```
+
+Output:
+
+| Metric | Value | Delta |
+|--------|-------|-------|
+| ❌ Tests | 243/250 passed (97.2%) | — |
+| 📈 Line Coverage | 87.3% | ▼ -3.2% |
+| 🔀 Branch Coverage | 82.2% | — |
+| ⚙️ Function Coverage | 91.3% | — |
+| ⏱️ Duration | 12.7s | +15% |
+
+> 🚨 **2 issues detected** — 4 tests failed, 2 flaky tests
+
+---
+
+## 📉 Automatic Regression Detection
+
+QualityHub stores run history locally in `.qualityhub/history.json`. On every run, it compares with the previous analysis and detects:
+
+- **Coverage drops** — "Coverage decreased 3.2% since last run"
+- **New test failures** — "2 new test failures since last run"
+- **Build slowdowns** — "Build time increased 18%"
+- **Removed tests** — "12 tests removed since last run"
+
+No server needed. History persists across runs.
+
+---
+
+## 🎨 Supported Frameworks
+
+| Framework | Language | Coverage | Tests |
+|-----------|----------|----------|-------|
+| **Jest** | JavaScript / TypeScript | ✅ | ✅ |
+| **JaCoCo** | Java / Kotlin | ✅ | — |
+| **JUnit** | Java / Kotlin / Python | — | ✅ |
+
+More coming soon: pytest, XCTest, Go test, Rust.
 
 ---
 
 ## 📄 qa-result.json Format
 
-Generated `qa-result.json`:
+QualityHub uses an open standard format for quality metrics:
 
 ```json
 {
   "version": "1.0.0",
   "project": {
     "name": "my-app",
-    "version": "1.0.0",
-    "commit": "abc123",
+    "version": "2.3.1",
+    "commit": "a3f4d2c",
     "branch": "main",
-    "timestamp": "2026-01-31T20:00:00Z"
+    "timestamp": "2026-02-17T20:00:00Z"
   },
   "quality": {
     "tests": {
-      "total": 247,
-      "passed": 245,
-      "failed": 2,
-      "skipped": 0,
-      "duration_ms": 8234,
-      "flaky_tests": ["UserAuthTest.testTimeout"]
+      "total": 250,
+      "passed": 243,
+      "failed": 4,
+      "skipped": 3,
+      "duration_ms": 12700,
+      "flaky_tests": ["Metrics API > should handle concurrent uploads"]
     },
     "coverage": {
-      "lines": 87.33,
-      "branches": 82.24,
-      "functions": 91.28,
-      "statements": 88.74
+      "lines": 87.3,
+      "branches": 82.2,
+      "functions": 91.3,
+      "statements": 88.7
     }
-  },
-  "metadata": {
-    "ci_provider": "github-actions",
-    "adapters": ["jest"]
   }
 }
 ```
 
+Any tool that outputs this format works with QualityHub. [Create your own adapter →](docs/creating-adapter.md)
+
 ---
 
-## 🧪 Examples
+## 🔧 All Commands
 
-See `examples/` directory for mock test files:
+| Command | Description |
+|---------|-------------|
+| `qualityhub init` | Initialize QualityHub in current directory |
+| `qualityhub parse <format> <path>` | Parse test results → `qa-result.json` |
+| `qualityhub analyze` | Analyze and show risk assessment |
+| `qualityhub analyze --format markdown` | Output as Markdown (for MR comments) |
+| `qualityhub analyze --format markdown -o report.md` | Save Markdown to file |
+| `qualityhub push <file>` | Push results to QualityHub server |
 
-- `examples/jest/` - Jest coverage + test results
-- `examples/jacoco/` - JaCoCo XML report
-- `examples/junit/` - JUnit XML reports
+---
 
-### Test with examples:
+## 🧪 Try It Now
 
 ```bash
+# Clone and test with example data
+git clone https://github.com/ybentlili/qualityhub-cli
+cd qualityhub-cli
+npm install && npm run build && npm link
+
+# Parse example Jest results
 qualityhub parse jest ./examples/jest
-qualityhub parse jacoco ./examples/jacoco/jacoco.xml
-qualityhub parse junit ./examples/junit
+
+# See the analysis
+qualityhub analyze
+
+# See it as Markdown
+qualityhub analyze --format markdown
 ```
 
 ---
 
-## 🔧 CLI Options
+## 🗺️ Roadmap
 
-### `parse` command
-
-```bash
-qualityhub parse <format> <path> [options]
-```
-
-**Arguments**:
-- `<format>`: Parser type (`jest`, `jacoco`, `junit`)
-- `<path>`: Path to test results
-
-**Options**:
-- `-o, --output <file>`: Output file (default: `qa-result.json`)
-- `-p, --project <name>`: Project name
-- `-v, --version <version>`: Project version
-- `-c, --commit <hash>`: Git commit hash
-- `-b, --branch <name>`: Git branch name
-
----
-
-## 🎨 Supported Frameworks
-
-| Framework | Language | Parser | Coverage | Tests |
-|-----------|----------|--------|----------|-------|
-| **Jest** | JavaScript/TypeScript | ✅ | ✅ | ✅ |
-| **JaCoCo** | Java/Kotlin | ✅ | ✅ | ❌ |
-| **JUnit** | Java/Kotlin/Python | ✅ | ❌ | ✅ |
-
-**Combine parsers** for complete coverage:
-```bash
-# Java project: JUnit (tests) + JaCoCo (coverage)
-qualityhub parse junit ./target/surefire-reports
-# Then merge coverage from JaCoCo manually
-```
-
----
-
-## 🐛 Troubleshooting
-
-### Parser not finding files
-
-```bash
-# Check file locations
-ls -la coverage/
-ls -la target/site/jacoco/
-ls -la build/test-results/
-
-# Use absolute paths
-qualityhub parse jest /Users/me/project/coverage
-```
-
-### Backend connection refused
-
-```bash
-# Check backend is running
-curl http://localhost:8080/api/v1/health
-
-# Update .qualityhub.yaml
-api_endpoint: http://localhost:8080
-```
+- [x] Parse Jest, JaCoCo, JUnit
+- [x] Risk score + go/no-go decision
+- [x] Local history + regression detection
+- [x] Markdown reports for MR/PR
+- [ ] Auto-comment on GitLab MR / GitHub PR
+- [ ] pytest adapter
+- [ ] SonarQube integration
+- [ ] AI-powered risk analysis (coming soon)
 
 ---
 
 ## 🔗 Links
 
-- **Main Repository**: [qualityhub](https://github.com/ybentlili/qualityhub)
-- **Issues**: [GitHub Issues](https://github.com/ybentlili/qualityhub-cli/issues)
-- **npm Package**: [qualityhub-cli](https://www.npmjs.com/package/qualityhub-cli)
+- **GitHub**: [ybentlili/qualityhub-cli](https://github.com/ybentlili/qualityhub-cli)
+- **npm**: [qualityhub-cli](https://www.npmjs.com/package/qualityhub-cli)
+- **Main project**: [ybentlili/qualityhub](https://github.com/ybentlili/qualityhub)
 
 ---
 
 ## 📝 License
 
-MIT License - see [LICENSE](LICENSE) file
+MIT — see [LICENSE](LICENSE)
 
 ---
 
 ## 🤝 Contributing
 
-Contributions welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+Contributions welcome! The easiest way to help:
 
----
+- **Add an adapter** — pytest, XCTest, Go test, Rust
+- **Report bugs** — [Open an issue](https://github.com/ybentlili/qualityhub-cli/issues)
+- **Star the repo** — It helps visibility ⭐
 
-**Built with ❤️ by the QualityHub community**
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details.

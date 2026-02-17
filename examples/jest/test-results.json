@@ -1,0 +1,121 @@
+{
+  "numFailedTestSuites": 1,
+  "numFailedTests": 4,
+  "numPassedTestSuites": 12,
+  "numPassedTests": 243,
+  "numPendingTestSuites": 0,
+  "numPendingTests": 3,
+  "numTotalTestSuites": 13,
+  "numTotalTests": 250,
+  "startTime": 1706745600000,
+  "success": false,
+  "testResults": [
+    {
+      "name": "src/__tests__/auth/login.test.ts",
+      "status": "passed",
+      "summary": "",
+      "startTime": 1706745600100,
+      "endTime": 1706745601200,
+      "assertionResults": [
+        { "ancestorTitles": ["Auth", "Login"], "title": "should login with valid credentials", "status": "passed", "duration": 120 },
+        { "ancestorTitles": ["Auth", "Login"], "title": "should reject invalid password", "status": "passed", "duration": 85 },
+        { "ancestorTitles": ["Auth", "Login"], "title": "should handle MFA flow", "status": "passed", "duration": 340 }
+      ]
+    },
+    {
+      "name": "src/__tests__/auth/register.test.ts",
+      "status": "passed",
+      "summary": "",
+      "startTime": 1706745601300,
+      "endTime": 1706745602000,
+      "assertionResults": [
+        { "ancestorTitles": ["Auth", "Register"], "title": "should create new user", "status": "passed", "duration": 210 },
+        { "ancestorTitles": ["Auth", "Register"], "title": "should validate email format", "status": "passed", "duration": 45 },
+        { "ancestorTitles": ["Auth", "Register"], "title": "should enforce password policy", "status": "passed", "duration": 55 }
+      ]
+    },
+    {
+      "name": "src/__tests__/api/projects.test.ts",
+      "status": "passed",
+      "summary": "",
+      "startTime": 1706745602100,
+      "endTime": 1706745604500,
+      "assertionResults": [
+        { "ancestorTitles": ["Projects API"], "title": "should list all projects", "status": "passed", "duration": 180 },
+        { "ancestorTitles": ["Projects API"], "title": "should create project", "status": "passed", "duration": 220 },
+        { "ancestorTitles": ["Projects API"], "title": "should update project settings", "status": "passed", "duration": 195 },
+        { "ancestorTitles": ["Projects API"], "title": "should delete project", "status": "passed", "duration": 150 },
+        { "ancestorTitles": ["Projects API"], "title": "should handle pagination", "status": "passed", "duration": 310 }
+      ]
+    },
+    {
+      "name": "src/__tests__/api/metrics.test.ts",
+      "status": "failed",
+      "summary": "Test suite failed",
+      "startTime": 1706745604600,
+      "endTime": 1706745608200,
+      "assertionResults": [
+        { "ancestorTitles": ["Metrics API"], "title": "should ingest qa-result.json", "status": "failed", "duration": 280 },
+        { "ancestorTitles": ["Metrics API"], "title": "should calculate risk score", "status": "failed", "duration": 190 },
+        { "ancestorTitles": ["Metrics API"], "title": "should handle concurrent uploads", "status": "failed", "duration": 5200, "failureMessages": ["Expected status 200 but received 429: Rate limit exceeded"] },
+        { "ancestorTitles": ["Metrics API"], "title": "should validate schema", "status": "passed", "duration": 95 },
+        { "ancestorTitles": ["Metrics API"], "title": "should timeout on large payloads", "status": "failed", "duration": 6100, "failureMessages": ["Timeout: async callback was not invoked within 5000ms"] }
+      ]
+    },
+    {
+      "name": "src/__tests__/parsers/jest-parser.test.ts",
+      "status": "passed",
+      "summary": "",
+      "startTime": 1706745608300,
+      "endTime": 1706745609100,
+      "assertionResults": [
+        { "ancestorTitles": ["Jest Parser"], "title": "should parse coverage-summary.json", "status": "passed", "duration": 65 },
+        { "ancestorTitles": ["Jest Parser"], "title": "should parse test-results.json", "status": "passed", "duration": 80 },
+        { "ancestorTitles": ["Jest Parser"], "title": "should handle missing files gracefully", "status": "passed", "duration": 30 },
+        { "ancestorTitles": ["Jest Parser"], "title": "should detect flaky tests", "status": "pending" }
+      ]
+    },
+    {
+      "name": "src/__tests__/parsers/jacoco-parser.test.ts",
+      "status": "passed",
+      "summary": "",
+      "startTime": 1706745609200,
+      "endTime": 1706745609800,
+      "assertionResults": [
+        { "ancestorTitles": ["JaCoCo Parser"], "title": "should parse XML report", "status": "passed", "duration": 120 },
+        { "ancestorTitles": ["JaCoCo Parser"], "title": "should calculate coverage percentages", "status": "passed", "duration": 55 },
+        { "ancestorTitles": ["JaCoCo Parser"], "title": "should handle empty reports", "status": "pending" }
+      ]
+    },
+    {
+      "name": "src/__tests__/risk/scoring.test.ts",
+      "status": "passed",
+      "summary": "",
+      "startTime": 1706745609900,
+      "endTime": 1706745611200,
+      "assertionResults": [
+        { "ancestorTitles": ["Risk Scoring"], "title": "should return 100 for perfect results", "status": "passed", "duration": 40 },
+        { "ancestorTitles": ["Risk Scoring"], "title": "should penalize failed tests", "status": "passed", "duration": 35 },
+        { "ancestorTitles": ["Risk Scoring"], "title": "should penalize low coverage", "status": "passed", "duration": 38 },
+        { "ancestorTitles": ["Risk Scoring"], "title": "should detect coverage regression", "status": "passed", "duration": 42 },
+        { "ancestorTitles": ["Risk Scoring"], "title": "should handle edge case: 0 tests", "status": "passed", "duration": 20 },
+        { "ancestorTitles": ["Risk Scoring"], "title": "should weight metrics correctly", "status": "pending" }
+      ]
+    },
+    {
+      "name": "src/__tests__/dashboard/components.test.ts",
+      "status": "passed",
+      "summary": "",
+      "startTime": 1706745611300,
+      "endTime": 1706745613500,
+      "assertionResults": [
+        { "ancestorTitles": ["Dashboard"], "title": "should render project list", "status": "passed", "duration": 450 },
+        { "ancestorTitles": ["Dashboard"], "title": "should render risk score gauge", "status": "passed", "duration": 380 },
+        { "ancestorTitles": ["Dashboard"], "title": "should render coverage chart", "status": "passed", "duration": 520 },
+        { "ancestorTitles": ["Dashboard"], "title": "should handle loading state", "status": "passed", "duration": 120 },
+        { "ancestorTitles": ["Dashboard"], "title": "should handle error state", "status": "passed", "duration": 110 }
+      ]
+    }
+  ],
+  "wasInterrupted": false
+}
