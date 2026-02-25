@@ -6,7 +6,7 @@
 
 **Know if your release is safe to deploy — in 2 seconds.**
 
-QualityHub CLI parses your test results, analyzes quality trends, detects regressions, and gives you a clear risk score with a go/no-go decision. Works locally, in CI/CD, and on merge requests.
+QualityHub CLI parses your test results, analyzes quality trends, detects regressions, and gives you a clear risk score with a go/no-go decision. Works locally, in CI/CD, and posts automatic quality reports directly on your GitLab MRs and GitHub PRs.
 
 <!-- TODO: replace with your actual GIF -->
 ![QualityHub CLI Demo](docs/demo.gif)
@@ -60,15 +60,21 @@ That's it. No account, no config, no server needed.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
+And automatically posted on your MR:
+
+<!-- TODO: add your screenshot here -->
+![MR Comment Screenshot](docs/comment.jpeg)
+
 ---
 
 ## ✨ Features
 
 - **🔍 Instant analysis** — Risk score + go/no-go decision in seconds
+- **💬 Auto MR/PR comments** — Posts quality reports directly on GitLab MRs and GitHub PRs
 - **📉 Regression detection** — Automatically compares with previous runs
 - **🎲 Flaky test detection** — Identifies slow/unreliable tests
 - **📊 Coverage tracking** — Lines, branches, functions with trend deltas
-- **📝 Markdown reports** — Post analysis directly on GitLab MRs / GitHub PRs
+- **📝 Markdown reports** — Clean formatted output for any CI system
 - **🔌 Multi-framework** — Jest, JUnit, JaCoCo out of the box
 - **⚡ Zero config** — Works instantly, no server required
 
@@ -100,14 +106,42 @@ qualityhub parse jest ./coverage \
 # Terminal output (default)
 qualityhub analyze
 
-# Markdown output (for MR/PR comments)
+# Markdown output
 qualityhub analyze --format markdown
 
 # Save markdown to file
 qualityhub analyze --format markdown --output report.md
 ```
 
-### 3. Push to QualityHub (optional)
+### 3. Post comment on GitLab MR / GitHub PR
+
+```bash
+# GitLab (auto-detects MR in CI)
+qualityhub analyze --comment
+
+# GitLab with explicit options
+qualityhub analyze --comment \
+  --provider gitlab \
+  --token $GITLAB_TOKEN \
+  --project-id 123 \
+  --mr-id 42
+
+# GitHub
+qualityhub analyze --comment \
+  --provider github \
+  --token $GITHUB_TOKEN \
+  --project-id owner/repo \
+  --mr-id 42
+
+# Self-hosted GitLab
+qualityhub analyze --comment \
+  --api-url https://gitlab.yourcompany.com \
+  --token $GITLAB_TOKEN
+```
+
+In CI/CD, `--token`, `--project-id`, and `--mr-id` are **auto-detected** from environment variables (`CI_PROJECT_ID`, `CI_MERGE_REQUEST_IID`, `GITLAB_TOKEN` for GitLab; `GITHUB_TOKEN`, `GITHUB_REPOSITORY`, `PR_NUMBER` for GitHub).
+
+### 4. Push to QualityHub (optional)
 
 ```bash
 qualityhub push qa-result.json
@@ -117,7 +151,7 @@ qualityhub push qa-result.json
 
 ## 🔄 CI/CD Integration
 
-### GitLab CI
+### GitLab CI — with automatic MR comments
 
 ```yaml
 quality-check:
@@ -125,7 +159,7 @@ quality-check:
   script:
     - npm test -- --coverage
     - npx qualityhub-cli parse jest ./coverage
-    - npx qualityhub-cli analyze
+    - npx qualityhub-cli analyze --comment
   cache:
     paths:
       - .qualityhub/   # Persist history between runs
@@ -133,16 +167,24 @@ quality-check:
     when: always
     paths:
       - qa-result.json
+  only:
+    - merge_requests
 ```
 
-### GitHub Actions
+> Set `GITLAB_TOKEN` as a CI/CD variable (needs `api` scope). The CLI auto-detects the MR and project ID from GitLab's environment variables.
+
+### GitHub Actions — with automatic PR comments
 
 ```yaml
+- name: Run tests
+  run: npm test -- --coverage
+
 - name: Quality Check
   run: |
-    npm test -- --coverage
     npx qualityhub-cli parse jest ./coverage
-    npx qualityhub-cli analyze
+    npx qualityhub-cli analyze --comment
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 - name: Cache QualityHub history
   uses: actions/cache@v3
@@ -151,19 +193,15 @@ quality-check:
     key: qualityhub-${{ github.ref }}
 ```
 
+> `GITHUB_TOKEN` is automatically available in GitHub Actions — no setup needed.
+
 The CLI exits with code 1 when the decision is **BLOCK**, so your pipeline fails automatically on critical quality issues.
 
 ---
 
-## 📝 Markdown Reports for Merge Requests
+## 📝 Auto MR/PR Comments
 
-Generate a markdown report to post on your MR/PR:
-
-```bash
-qualityhub analyze --format markdown
-```
-
-Output:
+When you run `qualityhub analyze --comment`, the CLI posts a formatted quality report directly on your merge request:
 
 | Metric | Value | Delta |
 |--------|-------|-------|
@@ -173,7 +211,9 @@ Output:
 | ⚙️ Function Coverage | 91.3% | — |
 | ⏱️ Duration | 12.7s | +15% |
 
-> 🚨 **2 issues detected** — 4 tests failed, 2 flaky tests
+> ⚠️ **CAUTION** — Risk Score: 72/100 · Review issues before deploying
+
+The comment is **automatically updated** on each pipeline run — no duplicate comments cluttering your MR.
 
 ---
 
@@ -246,9 +286,22 @@ Any tool that outputs this format works with QualityHub. [Create your own adapte
 | `qualityhub init` | Initialize QualityHub in current directory |
 | `qualityhub parse <format> <path>` | Parse test results → `qa-result.json` |
 | `qualityhub analyze` | Analyze and show risk assessment |
-| `qualityhub analyze --format markdown` | Output as Markdown (for MR comments) |
+| `qualityhub analyze --format markdown` | Output as Markdown |
 | `qualityhub analyze --format markdown -o report.md` | Save Markdown to file |
+| `qualityhub analyze --comment` | Post analysis as comment on GitLab MR / GitHub PR |
+| `qualityhub analyze --comment --provider github` | Post on GitHub PR |
 | `qualityhub push <file>` | Push results to QualityHub server |
+
+### `analyze --comment` options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--comment` | Enable MR/PR commenting | — |
+| `--provider <type>` | `gitlab` or `github` | `gitlab` |
+| `--token <token>` | API token (or `GITLAB_TOKEN` / `GITHUB_TOKEN` env var) | — |
+| `--project-id <id>` | GitLab project ID or GitHub `owner/repo` | auto-detected in CI |
+| `--mr-id <id>` | MR / PR number | auto-detected in CI |
+| `--api-url <url>` | Custom API URL (self-hosted GitLab) | — |
 
 ---
 
@@ -278,9 +331,11 @@ qualityhub analyze --format markdown
 - [x] Risk score + go/no-go decision
 - [x] Local history + regression detection
 - [x] Markdown reports for MR/PR
-- [ ] Auto-comment on GitLab MR / GitHub PR
+- [x] Auto-comment on GitLab MR / GitHub PR ← **New in v1.2.0**
+- [ ] Auto-detect git context (project, branch, commit)
+- [ ] Configurable thresholds (`.qualityhub.yaml`)
 - [ ] pytest adapter
-- [ ] SonarQube integration
+- [ ] GitHub Action on Marketplace
 - [ ] AI-powered risk analysis (coming soon)
 
 ---
