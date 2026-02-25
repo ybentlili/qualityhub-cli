@@ -1,6 +1,6 @@
 {
   "name": "qualityhub-cli",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "QualityHub CLI - Parse test results and push to QualityHub for AI-powered quality analysis",
   "main": "dist/index.js",
   "bin": {
