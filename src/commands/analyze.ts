@@ -2,6 +2,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import chalk from 'chalk';
 import type { QAResultOutput } from '../parsers/base.parser';
+import { detectProvider, manualProvider, postComment } from './git-provider';
 
 // ─── Types ───────────────────────────────────────────────────────────
 
@@ -546,7 +547,17 @@ function generateMarkdown(analysis: AnalysisResult): string {
 
 export async function analyzeCommand(
     inputFile: string,
-    options: { save?: boolean; format?: string; output?: string }
+    options: {
+        save?: boolean;
+        format?: string;
+        output?: string;
+        comment?: boolean;
+        provider?: string;
+        token?: string;
+        projectId?: string;
+        mrId?: string;
+        apiUrl?: string;
+    }
 ): Promise<void> {
     if (!fs.existsSync(inputFile)) {
         console.error(chalk.red(`\n❌ File not found: ${inputFile}`));
@@ -569,23 +580,58 @@ export async function analyzeCommand(
 
     const analysis = analyzeResult(qaResult);
 
+    // Always show terminal output
+    displayAnalysis(analysis);
+
+    // Handle --format markdown
     if (options.format === 'markdown') {
         const markdown = generateMarkdown(analysis);
-
         if (options.output) {
             fs.writeFileSync(options.output, markdown);
-            console.log(chalk.green(`\n✅ Markdown report saved to ${options.output}`));
+            console.log(chalk.green(`✅ Markdown report saved to ${options.output}`));
         } else {
             console.log(markdown);
         }
-    } else {
-        displayAnalysis(analysis);
     }
 
+    // Handle --comment
+    if (options.comment) {
+        const markdown = generateMarkdown(analysis);
+
+        // Try auto-detect first, then manual flags
+        let provider = detectProvider();
+
+        if (!provider && options.token && options.projectId && options.mrId) {
+            provider = manualProvider({
+                provider: options.provider || 'gitlab',
+                token: options.token,
+                projectId: options.projectId,
+                mrId: options.mrId,
+                apiUrl: options.apiUrl,
+            });
+        }
+
+        if (!provider) {
+            console.error(chalk.yellow('\n⚠️  Could not detect CI environment.'));
+            console.error(chalk.gray('   For manual use, provide:'));
+            console.error(chalk.gray('   --token <token> --project-id <id> --mr-id <id>'));
+            console.error(chalk.gray('   Or set env vars: GITLAB_TOKEN + CI_PROJECT_ID + CI_MERGE_REQUEST_IID'));
+        } else {
+            try {
+                await postComment(provider, markdown);
+            } catch (err: any) {
+                const msg = err.response?.data?.message || err.response?.data?.error || err.message;
+                console.error(chalk.red(`\n❌ Failed to post comment: ${msg}`));
+            }
+        }
+    }
+
+    // Save to history
     if (options.save !== false) {
         saveToHistory(qaResult, analysis.riskScore);
     }
 
+    // Exit with non-zero code if BLOCK
     if (analysis.decision === 'BLOCK') {
         process.exit(1);
     }
